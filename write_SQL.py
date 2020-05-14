@@ -12,14 +12,17 @@ class write_sql(object):
         self.cursor = self.conn.cursor()
         self.insert()
     def connection(self):
-        self.conn = pymysql.connect(
-            host=(lambda x: x['host'] if 'host' in self.Data_information.keys() else "localhost")(self.Data_information),
-            port=int((lambda x: x['port'] if 'port' in self.Data_information.keys() else "3306")(self.Data_information)),
-            user=(lambda x: x['user'] if 'user' in self.Data_information.keys() else "root")(self.Data_information),
-            password=self.Data_information['password'],
-            database=self.Data_information['db'],
-            charset="utf8"
-        )
+        try:
+            self.conn = pymysql.connect(
+                host=(lambda x: x['host'] if 'host' in self.Data_information.keys() else "localhost")(self.Data_information),
+                port=int((lambda x: x['port'] if 'port' in self.Data_information.keys() else "3306")(self.Data_information)),
+                user=(lambda x: x['user'] if 'user' in self.Data_information.keys() else "root")(self.Data_information),
+                password=self.Data_information['password'],
+                database=self.Data_information['db'],
+                charset="utf8"
+            )
+        except ValueError:
+            self.create_db()
     def create(self):
         self.cursor.execute("show tables")
         tables = self.cursor.fetchall()
@@ -67,4 +70,13 @@ class write_sql(object):
         Statement1 += ')'
         return Statement1
     def create_db(self):
-        raise ValueError('MySQL Incorrect Parameters')
+        import mysql.connector
+        mydb = mysql.connector.connect(
+            host=(lambda x: x['host'] if 'host' in self.Data_information.keys() else "localhost")(self.Data_information),
+            port=int((lambda x: x['port'] if 'port' in self.Data_information.keys() else "3306")(self.Data_information)),
+            user=(lambda x: x['user'] if 'user' in self.Data_information.keys() else "root")(self.Data_information),
+            password=self.Data_information['password']
+            )
+        mycursor = mydb.cursor()
+        mycursor.execute("CREATE DATABASE {}".format(self.Data_information['db']))
+        self.connection()
