@@ -64,6 +64,8 @@ class Threads:
         :param Thread_num:即将启动多线程个数,默认为1单线程
         :return True
         '''
+        if not isinstance(url, list):
+            raise ValueError('url is list')
         self.files,self.url = [],''
         self.title = label.keys()
         self.first_url,self.type_url,self.login,self.Parsing,self.label = url,type_url,login,Parsing,label

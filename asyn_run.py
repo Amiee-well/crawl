@@ -41,6 +41,8 @@ user_agent = [
 ]
 class asyn_http:
     def __init__(self,url,type_url,login,Parsing,label,write,clean,write_SQL,sem,Thread_num):
+        if not isinstance(url, list):
+            raise ValueError('url is list')
         self.title,self.files = label.keys(),[]
         self.url,self.type_url,self.login,self.Parsing = url,type_url,login,Parsing
         self.label,self.write,self.clean,self.write_SQL = label,write,clean,write_SQL

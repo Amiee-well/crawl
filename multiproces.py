@@ -47,6 +47,8 @@ user_agent = [
 
 class mult:
     def __init__(self,url,type_url,login,Parsing,label,write,clean,write_SQL,cpu_count):
+        if not isinstance(url, list):
+            raise ValueError('url is list')
         self.files,self.url = [],''
         self.title = label.keys()
         if cpu_count == 0:cpu_count = multiprocessing.cpu_count()

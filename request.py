@@ -74,33 +74,46 @@ class parse:
         program = self.threads()
         if self.texting:
             while True:
-                if not program.is_alive():
-                    self.times += 1
-                    self.threads()
-                    if self.times == 5:
-                        time.sleep(2)
-                        sys.exit(0)
-                time.sleep(3)
-    def threads(self):
-        program = Thread(target=self.runer,args=(self.first_url,self.type_url,self.login,self.Parsing,self.label,\
-            self.write,self.next_url,self.page,self.clean,self.write_SQL,self.Thread_num,self.sem,self.cpu_count))
-        program.start()
+                try:
+                    if not program.is_alive():
+                        self.times += 1
+                        self.threads()
+                        if self.times == 5:
+                            time.sleep(2)
+                            sys.exit(0)
+                    time.sleep(3)
+                except:break
         return program
-    def runer(self,url,type_url,login,Parsing,label,write,next_url,page,clean,write_SQL,Thread_num,sem,cpu_count):
+    def threads(self):
+        program = MyThread(self.status,self.first_url,self.type_url,self.login,self.Parsing,self.label,\
+            self.write,self.next_url,self.page,self.clean,self.write_SQL,self.Thread_num,self.sem,self.cpu_count)
+        program.start()
+        program.join()
+        return program.get_result()
+class MyThread(Thread):
+    def __init__(self,status,first_url,type_url,login,Parsing,label,\
+            write,next_url,page,clean,write_SQL,Thread_num,sem,cpu_count):
+        super(MyThread,self).__init__()
+        self.status = status
+        self.url,self.type_url,self.login,self.Parsing,self.label,self.write,self.next_url,self.page,self.clean,self.write_SQL,self.Thread_num,self.sem,self.cpu_count = first_url,type_url,login,Parsing,label,write,next_url,page,clean,write_SQL,Thread_num,sem,cpu_count
+    def run(self):
         if self.status.lower() == "none":
             from . import Thread_run
-            Thread_run.ordinary(url,type_url,login,Parsing,label,write,next_url,page,clean,write_SQL).run()
+            self.result = Thread_run.ordinary(self.url,self.type_url,self.login,self.Parsing,self.label,self.write,self.next_url,self.page,self.clean,self.write_SQL).run()
         elif self.status.lower() == 'multiprocessing':
             from . import multiproces
-            multiproces.mult(url,type_url,login,Parsing,label,write,clean,write_SQL,cpu_count).run()
+            multiproces.mult(self.url,self.type_url,self.login,self.Parsing,self.label,self.write,self.clean,self.write_SQL,self.cpu_count).run()
         elif self.status.lower() == 'threads':
             from . import Threads_run
-            Threads_run.Threads(url,type_url,login,Parsing,label,write,clean,write_SQL,Thread_num).run()
+            Threads_run.Threads(self.url,self.type_url,self.login,self.Parsing,self.label,self.write,self.clean,self.write_SQL,self.Thread_num).run()
         elif self.status.lower() == "aiohttp":
             from . import asyn_run
-            asyn_run.asyn_http(url,type_url,login,Parsing,label,write,clean,write_SQL,sem,Thread_num).run()
+            self.result = asyn_run.asyn_http(self.url,self.type_url,self.login,self.Parsing,self.label,self.write,self.clean,self.write_SQL,self.sem,self.Thread_num).run()
         elif self.status.lower() == "between":
             from . import double
-            double.double(url,type_url,login,Parsing,label,write,clean,write_SQL,cpu_count,sem).run()
+            self.result = double.double(self.url,self.type_url,self.login,self.Parsing,self.label,self.write,self.clean,self.write_SQL,self.cpu_count,self.sem).run()
         else:
             raise ValueError("status's parameter error !")
+    def get_result(self):
+        try:return self.result
+        except:return None

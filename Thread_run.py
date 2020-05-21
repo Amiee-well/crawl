@@ -66,6 +66,8 @@ class ordinary:
                          检测表是否存在,若不存在则创建,若存在则直接插入.
         :return True
         '''
+        if not isinstance(url, str):
+            raise ValueError('url is str')
         self.files,self.url = [],''
         self.title = label.keys()
         self.first_url,self.type_url,self.login,self.Parsing,self.label = url,type_url,login,Parsing,label
@@ -169,6 +171,7 @@ class ordinary:
             else:
                 if proxy:html = requests.get(url,headers = self.headers,proxies = proxy)
                 else:html = requests.get(url,headers = self.headers)
+            html.encoding = html.apparent_encoding
             if html.status_code == 200:
                 print("[Info] : Response is ok , Get the source code")
                 try:self.ip_mode.stop_thread(self.ip_mode.__dict__["ip"])
